@@ -14,7 +14,7 @@ configure_nginx(){
     systemctl enable nginx
 }
 
-reload(){
+reload_servers(){
     systemctl daemon-reload
     systemctl stop gunicorn
     systemctl stop nginx
@@ -24,4 +24,4 @@ reload(){
 
 configure_gunicorn
 configure_nginx
-reload
+reload_servers

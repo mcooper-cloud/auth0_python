@@ -37,17 +37,14 @@ Configure your callback and logout URLs:
 
 SSH into your EC2 instance and edit the file `constants.py` with the following values:
 
-Edit constants.py and replace the placeholders with the correct values.  Callback URLs should reference your EC2 instance's Public IPv4 DNS address and not `localhost`.  **_Emphasis: this method of secrets injection is not secure and should not be implemented within a production environment.  Instead secrets should be managed by a bonafide secrets management utility_**
+Copy `.env.example` to `.env` and replace the placeholders with the correct values.  Callback URLs should reference your EC2 instance's Public IPv4 DNS address and not `localhost`.  **_Emphasis: this method of secrets injection is not secure and should not be implemented within a production environment.  Instead secrets should be managed by a bonafide secrets management utility_**
 
 ```
 AUTH0_CLIENT_ID = '[Auth0 client ID goes here]'
 AUTH0_CLIENT_SECRET = '[Auth0 client secret goes here'
-AUTH0_CALLBACK_URL = 'http://${EC2_IPv4_DNS_HERE}/callback'
+AUTH0_CALLBACK_URL = 'http://[EC2_IPv4_DNS_HERE]/callback'
 AUTH0_DOMAIN = '[Auth0 domain goes here]'
-AUTH0_AUDIENCE = 'https://${AUTH0_DOMAIN_HERE}/api/v2/'
-PROFILE_KEY = 'profile'
-SECRET_KEY = '[some unique string]'
-JWT_PAYLOAD = 'jwt_payload'
+AUTH0_AUDIENCE = 'https://[AUTH0_DOMAIN_HERE]/api/v2/'
 ```
 
 ## Step 3: Configure NGINX and Gunicorn
@@ -60,6 +57,6 @@ SSH into your EC2 instance
 2. navigate to the `config` path and execute the script `config.sh`.  This will place both the nginx and gunicorn config files in the correct paths as well as start the application
 
 ```
-cd config
+cd app/config
 sudo ./config.sh
 ```

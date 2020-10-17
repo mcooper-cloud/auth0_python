@@ -21,7 +21,7 @@ This application is configured to run on a Ubuntu EC2 instance on AWS.
 ## Step 2: Configure NGINX and Gunicorn
 
 1. Login to the newly created instance (this Git repo should already be checked out in the directory `/home/ubuntu`)
-2. Edit constants.py and replace the placeholders with the correct values.  Callback URLs should reference your EC2 instance's Public IPv4 DNS address and not `localhost`.  **__Emphasis: this method of secrets injection is not secure and should not be implemented within a production environment.  Instead secrets should be managed by a bonafide secrets management utility __**
+2. Edit constants.py and replace the placeholders with the correct values.  Callback URLs should reference your EC2 instance's Public IPv4 DNS address and not `localhost`.  **_Emphasis: this method of secrets injection is not secure and should not be implemented within a production environment.  Instead secrets should be managed by a bonafide secrets management utility_**
 3. navigate to the `config` path and execute the script `config.sh`.  This will place both the nginx and gunicorn config files in the correct paths as well as start the application
 
 ```

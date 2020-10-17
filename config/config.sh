@@ -14,5 +14,14 @@ configure_nginx(){
     systemctl enable nginx
 }
 
+reload(){
+    systemctl daemon-reload
+    systemctl stop gunicorn
+    systemctl stop nginx
+    systemctl start gunicorn
+    systemctl start nginx
+}
+
 configure_gunicorn
 configure_nginx
+reload

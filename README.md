@@ -18,13 +18,48 @@ This application is configured to run on a Ubuntu EC2 instance on AWS.
 8. Select an existing security group, or create a new one using the wizard.  Ensure that ports 80 and 22 are open to your local IP address
 9. Click "Review and Launch" and select your SSH keypair
 
-## Step 2: Configure NGINX and Gunicorn
+When the deployment completes, make note of the IPv4 Public DNS name.
 
-1. Login to the newly created instance (this Git repo should already be checked out in the directory `/home/ubuntu`)
-2. Edit constants.py and replace the placeholders with the correct values.  Callback URLs should reference your EC2 instance's Public IPv4 DNS address and not `localhost`.  **_Emphasis: this method of secrets injection is not secure and should not be implemented within a production environment.  Instead secrets should be managed by a bonafide secrets management utility_**
-3. navigate to the `config` path and execute the script `config.sh`.  This will place both the nginx and gunicorn config files in the correct paths as well as start the application
+## Step 2: Create your Auth0 Application
+
+(from the Auth0 Console)
+
+Login to your Auth0 account and create a new application or use the default application that was created when you created your Auth0 account.
+
+Configure your callback and logout URLs:
+
+* The list of Callback URLs should contain `http://${EC2_IPv4_DNS_HERE}/callback`
+* The list of Logout URLs should contain `http://${EC2_IPv4_DNS_HERE}/`
+
+## Step 3: Configure App Constants
+
+(from the EC2 command line)
+
+SSH into your EC2 instance and edit the file `constants.py` with the following values:
+
+Edit constants.py and replace the placeholders with the correct values.  Callback URLs should reference your EC2 instance's Public IPv4 DNS address and not `localhost`.  **_Emphasis: this method of secrets injection is not secure and should not be implemented within a production environment.  Instead secrets should be managed by a bonafide secrets management utility_**
+
+```
+AUTH0_CLIENT_ID = '[Auth0 client ID goes here]'
+AUTH0_CLIENT_SECRET = '[Auth0 client secret goes here'
+AUTH0_CALLBACK_URL = 'http://${EC2_IPv4_DNS_HERE}/callback'
+AUTH0_DOMAIN = '[Auth0 domain goes here]'
+AUTH0_AUDIENCE = 'https://${AUTH0_DOMAIN_HERE}/api/v2/'
+PROFILE_KEY = 'profile'
+SECRET_KEY = '[some unique string]'
+JWT_PAYLOAD = 'jwt_payload'
+```
+
+## Step 3: Configure NGINX and Gunicorn
+
+(from the EC2 command line)
+
+SSH into your EC2 instance
+
+1. This Git repo should already be checked out in the directory `/home/ubuntu/app`
+2. navigate to the `config` path and execute the script `config.sh`.  This will place both the nginx and gunicorn config files in the correct paths as well as start the application
 
 ```
 cd config
-./config.sh
+sudo ./config.sh
 ```

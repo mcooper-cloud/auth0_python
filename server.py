@@ -101,9 +101,10 @@ def logout():
 @app.route('/dashboard')
 @requires_auth
 def dashboard():
-    return render_template('dashboard.html',
-                           userinfo=session[constants.PROFILE_KEY],
-                           userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD], indent=4))
+    return render_template( 'dashboard.html',
+                            email_verified=session[constants.JWT_PAYLOAD]['email_verified'],
+                            userinfo=session[constants.PROFILE_KEY],
+                            userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD], indent=4))
 
 
 if __name__ == "__main__":

@@ -60,3 +60,19 @@ SSH into your EC2 instance
 cd app/config
 sudo ./config.sh
 ```
+
+## Usage Instructions
+
+1. Once the application has been configured, hit the IPv4 Public DNS name of your EC2 instance.  This will present a default screen with a simple 'Login' button.
+2. Click login and select 'Sign in with Google' or 'Sign Up'
+    1. Sign Up: provide your email address and password.  This will generate an email validation request (sent to the email address used to sign up), and it will create a new user in your Auth0 application
+    2. Sign up with Google: This will request your Google username and password and will also create a new user in your Auth0 application.
+    3. Linked accounts: If the user signs in using thier email address and then later chooses 'Sign in with Google' (or visa versa), the [Auth0 account link extension](https://auth0.com/docs/extensions/account-link-extension) can be configured automatically detect a duplicate user and provide the user with the option to link both accounts.  If the user agrees, they will be prompted for the authentication information of the second account, and the accounts will be linked together presenting a single user within your Auth0 application.
+3. Email verification: this application demonstrates how to detect if a user has verified their email address.  If the user has not validated thier email, then basic information is witheld from that user.  Once the user has verified, that information is shown.
+4. Logout: Click the 'Logout' button to lot out
+
+This application also uses an Auth0 Rule to detect users' country of origin as well as regional information.  See:
+
+* [Auth0 Add Country Rule](auth0/)
+* https://auth0.com/rules/add-country
+

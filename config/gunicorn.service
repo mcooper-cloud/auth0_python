@@ -8,7 +8,7 @@ After=network.target
 
 [Service]
 WorkingDirectory=/home/ubuntu/
-ExecStart=/usr/bin/gunicorn3 -b 0.0.0.0:8080 --chdir app/ server:app
+ExecStart=/home/ubuntu/.flycatcher/bin/gunicorn -b 0.0.0.0:8080 --chdir app/ server:app
 
 [Install]
 WantedBy=multi-user.target

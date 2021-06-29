@@ -9,7 +9,7 @@ This application is configured to run on a Ubuntu EC2 instance on AWS.
 ## Step 1: Deploy an EC2 instance
 
 1. From the AWS EC2 console select `Launch Instance`
-2. Select the Ubuntu 18.04 LTS instance family (type 'ubuntu' in the search field)
+2. Select the Ubuntu 20.04 LTS instance family (type 'ubuntu' in the search field)
 3. Select the t2.micro instance family
 4. Select the proper VPC, Subnet and EC2 instance profile as necessary
 5. Under 'Advanced Details', copy and paste the `userdata.sh` file found here in the `bootstrap` path

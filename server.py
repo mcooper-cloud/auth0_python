@@ -15,22 +15,31 @@ from flask import url_for
 from authlib.integrations.flask_client import OAuth
 from six.moves.urllib.parse import urlencode
 
+app = Flask(__name__, static_url_path='/public', static_folder='./public')
+
 import constants
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
     load_dotenv(ENV_FILE)
 
-AUTH0_CALLBACK_URL = env.get(constants.AUTH0_CALLBACK_URL)
-AUTH0_CLIENT_ID = env.get(constants.AUTH0_CLIENT_ID)
-AUTH0_CLIENT_SECRET = env.get(constants.AUTH0_CLIENT_SECRET)
-AUTH0_DOMAIN = env.get(constants.AUTH0_DOMAIN)
-AUTH0_BASE_URL = 'https://{}'.format(AUTH0_DOMAIN)
-AUTH0_AUDIENCE = env.get(constants.AUTH0_AUDIENCE)
 
-app = Flask(__name__, static_url_path='/public', static_folder='./public')
-app.secret_key = constants.SECRET_KEY
+AUTH0_CALLBACK_URL = env.get('AUTH0_CALLBACK_URL')
+AUTH0_CLIENT_ID = env.get('AUTH0_CLIENT_ID')
+AUTH0_CLIENT_SECRET = env.get('AUTH0_CLIENT_SECRET')
+AUTH0_DOMAIN = env.get('AUTH0_DOMAIN')
+AUTH0_BASE_URL = 'https://{}'.format(AUTH0_DOMAIN)
+AUTH0_AUDIENCE = env.get('AUTH0_AUDIENCE')
+SECRET_KEY = env.get('SECRET_KEY')
+PROFILE_KEY = env.get('PROFILE_KEY')
+JWT_PAYLOAD = env.get('JWT_PAYLOAD')
+
+#app = Flask(__name__, static_url_path='/public', static_folder='./public')
+#app.secret_key = constants.SECRET_KEY
+app.secret_key = SECRET_KEY
 app.debug = True
+
+auth0_data = None
 
 
 @app.errorhandler(Exception)
@@ -58,7 +67,7 @@ auth0 = oauth.register(
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if constants.PROFILE_KEY not in session:
+        if PROFILE_KEY not in session:
             return redirect('/login')
         return f(*args, **kwargs)
 
@@ -73,16 +82,19 @@ def home():
 
 @app.route('/callback')
 def callback_handling():
-    auth0.authorize_access_token()
+
+    token = auth0.authorize_access_token()
+
     resp = auth0.get('userinfo')
     userinfo = resp.json()
 
-    session[constants.JWT_PAYLOAD] = userinfo
-    session[constants.PROFILE_KEY] = {
+    session[JWT_PAYLOAD] = userinfo
+    session[PROFILE_KEY] = {
         'user_id': userinfo['sub'],
         'name': userinfo['name'],
         'picture': userinfo['picture']
     }
+
     return redirect('/dashboard')
 
 
@@ -101,11 +113,26 @@ def logout():
 @app.route('/dashboard')
 @requires_auth
 def dashboard():
-    return render_template( 'dashboard.html',
-                            email_verified=session[constants.JWT_PAYLOAD]['email_verified'],
-                            userinfo=session[constants.PROFILE_KEY],
-                            userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD], indent=4))
 
+    auth0_data = auth0.__dict__
+
+    if 'email_verified' in session[JWT_PAYLOAD]:
+        email_verified = session[JWT_PAYLOAD]['email_verified']
+    else:
+        email_verified = False
+
+    try:
+        return render_template( 'dashboard.html',
+                                email_verified=email_verfiied,
+                                userinfo=session[PROFILE_KEY],
+                                userinfo_pretty=json.dumps(session[JWT_PAYLOAD], indent=4))
+
+    except Exception as e:
+
+        ##
+        ## this can happen when reciving profile data from SAML connecitons
+        ##
+        return render_template('error.html', message=e)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=env.get('PORT', 3000))
